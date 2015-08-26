@@ -39,7 +39,7 @@ int main()
 	isOpened_i2c = rtc_i2c_.open(BlackLib::NonBlock);
 
 	//Opening and declaring the csv file
-	csv_operations csvfile;
+	csv_operations *csvout = new csv_operations(createfilename());
 
 	// Check that everything went well
 	if (isOpened_spi)
@@ -52,7 +52,7 @@ int main()
 	else
 		cout << "Warning, RTC is not responding" << endl;
 
-	if (csvfile.is_open())
+	if (csvout->is_open())
 		cout << "CSV file is ready" << endl;
 	else
 		cout << "Warning, CSV file is not open" << endl;
@@ -75,7 +75,7 @@ int main()
 		rtc_display(rtc_data_);
 
 		// Send data to CSV file
-		csvfile.csv_write(adis_data_,rtc_data_);
+		csvout->csv_write(adis_data_,rtc_data_);
 
 		usleep(5000);
 	}

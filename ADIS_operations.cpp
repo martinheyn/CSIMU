@@ -78,7 +78,7 @@ void adis_read_spi(BlackLib::BlackSPI* adis_spi, uint8_t* commands, uint8_t* dat
 	    cout << "Max Speed(Hz) : " << adis_spi->getMaximumSpeed() << endl;
 	    cout << "Bits Per Word : " << (int)adis_spi->getBitsPerWord() << endl;
 	    cout << "Mode          : " << (int)adis_spi->getMode() << endl;
-	} */
+	}*/
 
 	adis_spi->transfer(commands, data, ADIS_BUFFER_SIZE__, 0);
 

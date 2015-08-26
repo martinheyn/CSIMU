@@ -48,24 +48,24 @@ void rtc_read_i2c(BlackLib::BlackI2C* rtc_i2c, uint8_t* data_rtc, bool isOpened_
 void rtc_extract_message(uint8_t data_rtc[], double output_rtc[]) {
 	// This is really really stupid. I hate C++.
 
-	time_t currentTime = time(0);
-	tm* currentDate = localtime(&currentTime);
+	//time_t currentTime = time(0);
+	//tm* currentDate = localtime(&currentTime);
 
-/*	output_rtc[0] = year;
-	output_rtc[1] = month;
-	output_rtc[2] = day;
-	output_rtc[3] = hour;
-	output_rtc[4] = minute;
-	output_rtc[5] = second;
-	output_rtc[6] = millisecs; */
+	output_rtc[0] = (double)data_rtc[0];//year;
+	output_rtc[1] = (double)data_rtc[1];//month;
+	output_rtc[2] = (double)data_rtc[2];//day;
+	output_rtc[3] = (double)data_rtc[3];//hour;
+	output_rtc[4] = (double)data_rtc[4];//minute;
+	output_rtc[5] = (double)data_rtc[5];//second;
+	output_rtc[6] = 0;//millisecs;
 
-	output_rtc[0] = (double)currentDate->tm_year+1900;
+	/*output_rtc[0] = (double)currentDate->tm_year+1900;
 	output_rtc[1] = (double)currentDate->tm_mon+1;
 	output_rtc[2] = (double)currentDate->tm_mday;
 	output_rtc[3] = (double)currentDate->tm_hour;
 	output_rtc[4] = (double)currentDate->tm_min;
 	output_rtc[5] = (double)currentDate->tm_sec;
-	output_rtc[6] = 0; // we get to that later
+	output_rtc[6] = 0; // we get to that later */
 }
 
 void rtc_16bit_commands_to_char(uint16_t rtc_commands[], uint8_t char_commands[], size_t rtc_commands_size) {
