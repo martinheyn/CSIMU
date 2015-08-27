@@ -21,23 +21,24 @@ void rtc_read_i2c(BlackLib::BlackI2C* rtc_i2c, uint8_t* data_rtc, bool isOpened_
     for(int i=0;i<=RTC_BUFFER_SIZE__;i++) {
         switch (i)
         {
-        case 5: // SECONDS
-            data_rtc[5] = (rtc_i2c->readByte(0x00) & 0b01111111);
+
+        case 5: // SECONDS  // FIXED BCD to decimal conversion (yeah no hex-numbers this time in contrast to ADIS...)
+            data_rtc[5] = (((rtc_i2c->readByte(0x00) & 0b01110000) >> 4) *10) + (rtc_i2c->readByte(0x00) & 0b00001111);
             break;
         case 4: // MINUTES
-            data_rtc[4] = (rtc_i2c->readByte(0x01) & 0b01111111);
+        	data_rtc[4] = (((rtc_i2c->readByte(0x01) & 0b01110000) >> 4) *10) + (rtc_i2c->readByte(0x01) & 0b00001111);
             break;
         case 3: // HOURS
-        	data_rtc[3] = (rtc_i2c->readByte(0x02) & 0b00011111);
+        	data_rtc[3] = (((rtc_i2c->readByte(0x02) & 0b00110000) >> 4) *10) + (rtc_i2c->readByte(0x02) & 0b00001111);
         	break;
         case 2: // DATE
-			data_rtc[2] = (rtc_i2c->readByte(0x04) & 0b00011111);
+        	data_rtc[2] = (((rtc_i2c->readByte(0x04) & 0b00110000) >> 4) *10) + (rtc_i2c->readByte(0x04) & 0b00001111);
 			break;
         case 1: // MONTH
-        	data_rtc[1] = (rtc_i2c->readByte(0x05) & 0b00011111);
+        	data_rtc[1] = (((rtc_i2c->readByte(0x05) & 0b00010000) >> 4) *10) + (rtc_i2c->readByte(0x05) & 0b00001111);
         	break;
         case 0: // YEAR
-        	data_rtc[0] = (rtc_i2c->readByte(0x06) & 0b11111111);
+        	data_rtc[0] = (((rtc_i2c->readByte(0x06) & 0b11110000) >> 4) *10) + (rtc_i2c->readByte(0x06) & 0b00001111);
         	break;
         }
     }
