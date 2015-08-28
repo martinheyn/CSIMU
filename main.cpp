@@ -57,31 +57,66 @@ int main()
 	else
 		cout << "Warning, CSV file is not open" << endl;
 
+	// Reading and setting the alarm times
+	int startalarmtime_[4];
+	int stopalarmtime_[4];
+	bool startalarm_ = 0;
+	bool stopalarm_ = 0;
+	double controlalarm_[4];
+
+	file_get_startstop(startalarmtime_,stopalarmtime_, ALARMFILE__);
+
+	cout << "I have read the following start-times: " << startalarmtime_[0] << "--" << startalarmtime_[1] << ":" << startalarmtime_[2] << ":" << startalarmtime_[3] << endl;
+	cout << "I have read the following stop-times: " << stopalarmtime_[0] << "--" << stopalarmtime_[1] << ":" << stopalarmtime_[2] << ":" << stopalarmtime_[3] << endl;
+
+	rtc_reset_alarm_i2c(&rtc_i2c_, isOpened_i2c);
+	rtc_set_alarm_i2c(&rtc_i2c_, startalarmtime_,0, isOpened_i2c); // set first alarm clock
+	rtc_set_alarm_i2c(&rtc_i2c_, stopalarmtime_,1, isOpened_i2c); // set second alarm clock
+	rtc_read_alarm_i2c(&rtc_i2c_, controlalarm_,isOpened_i2c);
+	cout << "I have set the following alarm: " << controlalarm_[0] << "--" << controlalarm_[1] << ":" << controlalarm_[2] << ":" << controlalarm_[3] << endl;
+
+
 	// Start actual program
 
+	cout << "Waiting for start" << endl;
+
+	while ( !startalarm_)
+	{
+		startalarm_ = rtc_check_alarm (&rtc_i2c_, 0, isOpened_i2c);
+		msleep(10);
+	}
+
+
 	cout << "Starting the record loop" << endl;
-	while (true)
+
+	int tempcount = 1;
+	while ( !stopalarm_)
 	{
 		// Read the raw data
 		adis_read_spi(&adis_spi_, adis_commands_, adis_rawdata_, isOpened_spi); // Read raw ADIS data
-		rtc_read_i2c(&rtc_i2c_, rtc_rawdata_, isOpened_i2c); // Read raw Real Time Clock data
+		//rtc_read_i2c(&rtc_i2c_, rtc_rawdata_, isOpened_i2c); // Read raw Real Time Clock data
+		// READING THE REAL TIME CLOCK IS SO SLOW, TOO SLOW ==> FIX THAT NEXT WEEK.
 
 		// Convert raw data to normal data
 		adis_extract_message(adis_rawdata_, adis_data_); // Convert weird ADIS data to readable data
-		rtc_extract_message(rtc_rawdata_, rtc_data_); // Convert RTC data to readable data
+		//rtc_extract_message(rtc_rawdata_, rtc_data_); // Convert RTC data to readable data
 
 		// Display data
-		adis_display(adis_data_);
-		rtc_display(rtc_data_);
+		//adis_display(adis_data_);
+		//rtc_display(rtc_data_);
 
 		// Send data to CSV file
 		csvout->csv_write(adis_data_,rtc_data_);
-
-		usleep(5000);
+		stopalarm_ = rtc_check_alarm (&rtc_i2c_, 1, isOpened_i2c);
+		tempcount++;
+		//usleep(5000);
+		msleep(0.1);
 	}
 
+	rtc_reset_alarm_i2c(&rtc_i2c_, isOpened_i2c);
 	adis_spi_.close(); // Close SPI connection to IMU
 	rtc_i2c_.close(); // Close I2C connection to RTC
+	cout << "I managed to write: " << tempcount << " lines." << endl;
 	return 0;
 
 }
