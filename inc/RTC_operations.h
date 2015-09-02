@@ -27,6 +27,8 @@ typedef enum {
 void rtc_read_i2c(BlackLib::BlackI2C* rtc_i2c, uint8_t* data_rtc, bool isOpened_i2c );
 void rtc_write_i2c(BlackLib::BlackI2C* rtc_i2c, uint8_t* data_rtc, bool second_alarm, bool isOpened_i2c );
 bool rtc_check_alarm (BlackLib::BlackI2C* rtc_i2c, bool second_alarm, bool isOpened_i2c );
+void rtc_read_systemtime(timeval* tnow, double output_rtc[]);
+bool rtc_check_stopalarm (int stoptime[], double output_rtc[]);
 void rtc_set_alarm_i2c(BlackLib::BlackI2C* rtc_i2c, int* data, bool second_alarm, bool isOpened_i2c );
 void rtc_reset_alarm_i2c(BlackLib::BlackI2C* rtc_i2c, bool isOpened_i2c );
 void rtc_read_alarm_i2c(BlackLib::BlackI2C* rtc_i2c, double* data_rtc, bool isOpened_i2c );

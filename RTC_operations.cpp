@@ -148,6 +148,17 @@ bool rtc_check_alarm (BlackLib::BlackI2C* rtc_i2c, bool second_alarm, bool isOpe
 
 }
 
+bool rtc_check_stopalarm (int stoptime[], double output_rtc[]) {
+	bool stop_signal;
+
+	if ((stoptime[0] == output_rtc[2]) && (stoptime[1] == output_rtc[3]) && (stoptime[2] == output_rtc[4]) && (stoptime[3] == output_rtc[5]))
+		stop_signal = true;
+	else
+		stop_signal = false;
+
+	return stop_signal;
+}
+
 void file_get_startstop (int* starttime, int* stoptime, std::string filelocation) {
 	ifstream datefile;
 	datefile.open(filelocation);
@@ -168,6 +179,22 @@ void rtc_extract_message(uint8_t data_rtc[], double output_rtc[]) {
 	output_rtc[4] = (double)data_rtc[4];//minute;
 	output_rtc[5] = (double)data_rtc[5];//second;
 	output_rtc[6] = 0;//millisecs;
+
+}
+
+void rtc_read_systemtime(timeval* tnow, double output_rtc[]) {
+
+	time_t currentTime = time(0);
+	tm* currentDate = localtime(&currentTime);
+	gettimeofday(tnow,NULL);
+
+	output_rtc[0] = (double)currentDate->tm_year+1900;
+	output_rtc[1] = (double)currentDate->tm_mon+1;
+	output_rtc[2] = (double)currentDate->tm_mday;
+	output_rtc[3] = (double)currentDate->tm_hour;
+	output_rtc[4] = (double)currentDate->tm_min;
+	output_rtc[5] = (double)currentDate->tm_sec;
+	output_rtc[6] = (double)tnow->tv_usec;
 
 }
 

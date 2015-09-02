@@ -43,7 +43,7 @@ std::string createfilename()
 	ostringstream newfilename;
 	time_t currentTime = time(0);
 		tm* currentDate = localtime(&currentTime);
-		newfilename << "/media/store/ADIS16364-" << currentDate->tm_year+1900 << currentDate->tm_mon+1 << currentDate->tm_mday << "_" << currentDate->tm_hour << currentDate->tm_min << currentDate->tm_sec << ".csv";
+		newfilename << "/media/store/ADIS16364_" << currentDate->tm_year+1900 << currentDate->tm_mon+1 << currentDate->tm_mday << "_" <<currentDate->tm_hour << currentDate->tm_min << currentDate->tm_sec << ".csv";
 		return newfilename.str();
 
 }
