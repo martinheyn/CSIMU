@@ -18,7 +18,7 @@ void rtc_read_i2c(BlackLib::BlackI2C* rtc_i2c, uint8_t* data_rtc, bool isOpened_
 		exit(1);
 	}
 
-    for(int i=0;i<=RTC_BUFFER_SIZE__;i++) {
+    for(int i=3;i<=RTC_BUFFER_SIZE__;i++) {
         switch (i)
         {
 
@@ -31,7 +31,11 @@ void rtc_read_i2c(BlackLib::BlackI2C* rtc_i2c, uint8_t* data_rtc, bool isOpened_
         case 3: // HOURS
         	data_rtc[3] = (((rtc_i2c->readByte(0x02) & 0b00110000) >> 4) *10) + (rtc_i2c->readByte(0x02) & 0b00001111);
         	break;
-        case 2: // DATE
+
+        	data_rtc[2] = 0;
+        	data_rtc[1] = 0;
+        	data_rtc[0] = 0;
+      /*case 2: // DATE
         	data_rtc[2] = (((rtc_i2c->readByte(0x04) & 0b00110000) >> 4) *10) + (rtc_i2c->readByte(0x04) & 0b00001111);
 			break;
         case 1: // MONTH
@@ -39,7 +43,7 @@ void rtc_read_i2c(BlackLib::BlackI2C* rtc_i2c, uint8_t* data_rtc, bool isOpened_
         	break;
         case 0: // YEAR
         	data_rtc[0] = (((rtc_i2c->readByte(0x06) & 0b11110000) >> 4) *10) + (rtc_i2c->readByte(0x06) & 0b00001111);
-        	break;
+        	break;*/
         }
     }
 
@@ -172,9 +176,16 @@ void file_get_startstop (int* starttime, int* stoptime, std::string filelocation
 void rtc_extract_message(uint8_t data_rtc[], double output_rtc[]) {
 	// This is really really stupid. I hate C++.
 
-	output_rtc[0] = (double)data_rtc[0];//year;
-	output_rtc[1] = (double)data_rtc[1];//month;
-	output_rtc[2] = (double)data_rtc[2];//day;
+
+	time_t currentTime = time(0);
+	tm* currentDate = localtime(&currentTime);
+
+	output_rtc[0] = (double)currentDate->tm_year+1900;
+	output_rtc[1] = (double)currentDate->tm_mon+1;
+	output_rtc[2] = (double)currentDate->tm_mday;
+	//output_rtc[0] = (double)data_rtc[0];//year;
+	//output_rtc[1] = (double)data_rtc[1];//month;
+	//output_rtc[2] = (double)data_rtc[2];//day;
 	output_rtc[3] = (double)data_rtc[3];//hour;
 	output_rtc[4] = (double)data_rtc[4];//minute;
 	output_rtc[5] = (double)data_rtc[5];//second;

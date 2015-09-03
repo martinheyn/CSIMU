@@ -111,13 +111,13 @@ int main()
 
 		// Read the raw data
 		adis_read_spi(&adis_spi_, adis_commands_, adis_rawdata_, isOpened_spi); // Read raw ADIS data
-		//rtc_read_i2c(&rtc_i2c_, rtc_rawdata_, isOpened_i2c); // Read raw Real Time Clock data
+		rtc_read_i2c(&rtc_i2c_, rtc_rawdata_, isOpened_i2c); // Read raw Real Time Clock data
 		// READING THE REAL TIME CLOCK IS SO SLOW, TOO SLOW ==> FIX THAT NEXT WEEK.
 
 		// Convert raw data to normal data
 		adis_extract_message(adis_rawdata_, adis_data_); // Convert weird ADIS data to readable data
-		//rtc_extract_message(rtc_rawdata_, rtc_data_); // Convert RTC data to readable data
-		rtc_read_systemtime(&tnow_, rtc_data_);
+		rtc_extract_message(rtc_rawdata_, rtc_data_); // Convert RTC data to readable data
+		//rtc_read_systemtime(&tnow_, rtc_data_);
 
 		if (rtc_data_[5] - prevsec != 0) {
 			prevsec = rtc_data_[5];
@@ -143,7 +143,7 @@ int main()
 		readcount++;
 		//msleep(1000/(s_frequency + 0.5*e_frequency));
 		//msleep(1);
-		usleep(1000);
+		usleep(1);
 	}
 
 	rtc_reset_alarm_i2c(&rtc_i2c_, isOpened_i2c); // Remove the alarm from the RTC
