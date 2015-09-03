@@ -24,7 +24,7 @@ class csv_operations
 
 
     bool is_open();
-    void csv_write(double imu_data[], double rtc_data[]);        // eine Funktion mit einem (Default-) Parameter
+    void csv_write(int readcount, double imu_data[], double rtc_data[]);        // eine Funktion mit einem (Default-) Parameter
 
   private:
 	std::string filename;

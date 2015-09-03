@@ -14,7 +14,7 @@ csv_operations::csv_operations(string const & FileName) // initiates a csv-file 
 	//filename = csv_operations::createfilename();
 	count = 0;
 	this->csvfile.set_delimiter(DELIMITER__);
-	this->csvfile << "PROD_ID" << "SYSTEM_STAT" << "POWER_SUP" << "X_ACCL" << "Y_ACCL" << "Z_ACCL" << "X_GYRO" << "Y_GYRO" << "Z_GYRO" << "X_TEMP" << "Y_TEMP" << "Z_TEMP" << "YEAR" << "MONTH" << "DATE" << "HOUR" << "MINUTE" << "SECOND" << "MILLISECONDS" << "RUNNUMBER" << NEWLINE__;
+	this->csvfile << "PROD_ID" << "SYSTEM_STAT" << "POWER_SUP" << "X_ACCL" << "Y_ACCL" << "Z_ACCL" << "X_GYRO" << "Y_GYRO" << "Z_GYRO" << "X_TEMP" << "Y_TEMP" << "Z_TEMP" << "YEAR" << "MONTH" << "DATE" << "HOUR" << "MINUTE" << "SECOND" << "SAMPLES_IN_THIS_SEC" << "RUNNUMBER" << NEWLINE__;
 	this->csvfile.flush();
 }
 
@@ -31,9 +31,9 @@ bool csv_operations::is_open()
 
 }
 
-void csv_operations::csv_write(double imu_data[], double rtc_data[])
+void csv_operations::csv_write(int readcount, double imu_data[], double rtc_data[])
 {
-	this->csvfile << imu_data[0] << imu_data[1] << imu_data[2] << imu_data[3] << imu_data[4] << imu_data[5] << imu_data[6] << imu_data[7] << imu_data[8] << imu_data[9] << imu_data[10] << imu_data[11] << rtc_data[0] << rtc_data[1] << rtc_data[2] << rtc_data[3] << rtc_data[4] << rtc_data[5]  << rtc_data[6] << this->count << NEWLINE__;
+	this->csvfile << imu_data[0] << imu_data[1] << imu_data[2] << imu_data[3] << imu_data[4] << imu_data[5] << imu_data[6] << imu_data[7] << imu_data[8] << imu_data[9] << imu_data[10] << imu_data[11] << rtc_data[0] << rtc_data[1] << rtc_data[2] << rtc_data[3] << rtc_data[4] << rtc_data[5]  << readcount << this->count << NEWLINE__;
 	count++;
 
 }

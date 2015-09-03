@@ -37,6 +37,7 @@ int main()
 	adis_init(adis_commands_);
 
 	BlackLib::BlackSPI adis_spi_(BlackLib::SPI0_0, 8, BlackLib::SpiMode3, 300000); // Declare IMU device and open SPI port
+	//BlackLib::BlackSPI adis_spi_(BlackLib::SPI0_0, 8, BlackLib::SpiMode3, 2000000);
 	isOpened_spi = adis_spi_.open(BlackLib::NonBlock);
 
 	//Opening and declaring the I2C port for the RTC
@@ -84,7 +85,9 @@ int main()
 	rtc_set_alarm_i2c(&rtc_i2c_, stopalarmtime_,1, isOpened_i2c); // set second alarm clock
 	rtc_read_alarm_i2c(&rtc_i2c_, controlalarm_,isOpened_i2c);
 	cout << "I have set the following alarm: " << controlalarm_[0] << "--" << controlalarm_[1] << ":" << controlalarm_[2] << ":" << controlalarm_[3] << endl;
-
+		rtc_data_[5] = (double)startalarmtime_[3];
+		rtc_data_[4] = (double)startalarmtime_[2];
+		rtc_data_[3] = (double)startalarmtime_[1];
 
 	// STARTING THE PROGRAM LOOP
 	cout << "Waiting for start" << endl;
@@ -92,15 +95,14 @@ int main()
 	while ( !startalarm_)
 	{
 		startalarm_ = rtc_check_alarm (&rtc_i2c_, 0, isOpened_i2c);
-		msleep(1);
+		usleep(1);
 	}
 
 
 	cout << "Starting the record loop" << endl;
 
-	double prevsec = 0;
-	int s_frequency = 200;
-	int e_frequency = 0;
+	double prevsec = startalarmtime_[3];
+	double prevmin = 0;
 	int readcount = 0;
 
 	struct timeval tnow_;//, loopbegin_exec_, loopend_exec_;
@@ -112,18 +114,26 @@ int main()
 		// Read the raw data
 		adis_read_spi(&adis_spi_, adis_commands_, adis_rawdata_, isOpened_spi); // Read raw ADIS data
 		rtc_read_i2c(&rtc_i2c_, rtc_rawdata_, isOpened_i2c); // Read raw Real Time Clock data
-		// READING THE REAL TIME CLOCK IS SO SLOW, TOO SLOW ==> FIX THAT NEXT WEEK.
+		// READING THE REAL TIME CLOCK IS SO SLOW SO I HACKED MY WAY INTO READING IT FASTER, SEE BELOW. IT'S MESSY
 
 		// Convert raw data to normal data
 		adis_extract_message(adis_rawdata_, adis_data_); // Convert weird ADIS data to readable data
 		rtc_extract_message(rtc_rawdata_, rtc_data_); // Convert RTC data to readable data
 		//rtc_read_systemtime(&tnow_, rtc_data_);
 
-		if (rtc_data_[5] - prevsec != 0) {
+		if (rtc_data_[5] - prevsec != 0) { // FIX THAT WHEN TIME!! I am giving up, I am hacking my way through here. We only read seconds from the RTC and improvise the rest now
 			prevsec = rtc_data_[5];
-			e_frequency = s_frequency - readcount;
+			if (rtc_data_[5] == 0) {
+				rtc_data_[4]++;
+				if (rtc_data_[4] > 60) {
+					rtc_data_[4] = 0;
+					rtc_data_[3]++;
+					if (rtc_data_[3] > 23)
+						rtc_data_[3] = 0;
+				}
+			}
 			cout << "The current freq ist: " << readcount << endl;
-			readcount = 0;
+			readcount = 1;
 		}
 
 		// Display data
@@ -131,18 +141,13 @@ int main()
 		//rtc_display(rtc_data_);
 
 		// Send data to CSV file
-		csvout->csv_write(adis_data_,rtc_data_);
+		csvout->csv_write(readcount, adis_data_,rtc_data_);
+
 		//stopalarm_ = rtc_check_alarm (&rtc_i2c_, 1, isOpened_i2c);
 		stopalarm_ = rtc_check_stopalarm(stopalarmtime_,rtc_data_);
-		//usleep(5000);
-		//gettimeofday(&loopend_exec_,NULL);
 
-		//cout<<"ELAPSED TIME IS: " << end_exec.tv_usec - begin_exec.tv_usec << endl;
-
-		//usleep(20000-(loopend_exec_.tv_usec - loopbegin_exec_.tv_usec));
 		readcount++;
-		//msleep(1000/(s_frequency + 0.5*e_frequency));
-		//msleep(1);
+
 		usleep(1);
 	}
 
