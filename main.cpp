@@ -53,10 +53,17 @@ int main()
 	csv_operations *csvout = new csv_operations(createfilename());
 
 	// CHECKING
-	if (isOpened_spi)
-		cout << "IMU is responding" << endl;
+	if (isOpened_spi) {
+		cout << "SPI is responding" << endl;
+		adis_read_spi(&adis_spi_, adis_commands_, adis_rawdata_, isOpened_spi);
+		adis_extract_message(adis_rawdata_, adis_data_);
+		if (adis_data_[0] == 16364)
+			cout << "ADIS 16364 responds" << endl;
+		else
+			cout << "Warning, IMU device is not responding correctly, the response was " << adis_data_[0] << endl;
+	}
 	else
-		cout << "Warning, IMU is not responding" << endl;
+		cout << "Warning, SPI is not responding" << endl;
 
 	if (isOpened_i2c)
 		cout << "RTC is responding" << endl;
@@ -132,7 +139,7 @@ int main()
 						rtc_data_[3] = 0;
 				}
 			}
-			cout << "The current freq ist: " << readcount << endl;
+			//cout << "The current freq ist: " << readcount << endl;
 			readcount = 1;
 		}
 
