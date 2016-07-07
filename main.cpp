@@ -18,14 +18,15 @@ int main()
 
 
 	// SYNCHRONISATION
-	//Before we do anything here, we synchronise the system clocks (RTC & internal clock) with the NTP server by calling the service who does that (dirty hack, will only work on OATRC'15 but I am running out of time here)
+	//Before we do anything here, we synchronise the system clocks (RTC & internal clock) with the NTP server by calling the service who does that (dirty hack, will only work on AO2016 but I am running out of time here)
 	cout << "Synchronisation with network time prototocol server, this takes 40 seconds" << endl;
-	system("systemctl start rtc-ds3231.service");
+	system("systemctl start rtc_ds3231.service");
 	msleep(40000);
+	system("echo 0x68 > /sys/class/i2c-adapter/i2c-1/delete_device");
 
-	//Opening the common folder on the NAS server (Again Hacking it because of lack of time. THIS WILL ONLY WORK ON OATRC'15)
+	//Opening the common folder on the NAS server (Again Hacking it because of lack of time. THIS WILL ONLY WORK ON AO2016)
 	cout << "Opening the network attached server shared folder, takes about 10 seconds" << endl;
-	system("systemctl start nfs-share.service");
+	system("systemctl start nfs_share.service");
 	msleep(10000);
 
 	//Opening and declaring the SPI port for the IMU
