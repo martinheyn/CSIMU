@@ -133,7 +133,7 @@ int main()
 			prevsec = rtc_data_[5];
 			if (rtc_data_[5] == 0) {
 				rtc_data_[4]++;
-				if (rtc_data_[4] > 60) {
+				if (rtc_data_[4] > 59) {
 					rtc_data_[4] = 0;
 					rtc_data_[3]++;
 					if (rtc_data_[3] > 23)
